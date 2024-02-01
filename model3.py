@@ -1,30 +1,22 @@
-from transformers import AutoFeatureExtractor, ResNetForImageClassification
-import torch
-from datasets import load_dataset
-from PIL import Image
-import requests
-import matplotlib.pyplot as plt
+from ultralyticsplus import YOLO, render_result
 
-# dataset = load_dataset("huggingface/cats-image")
-# image_path = dataset["test"]["image"][0]
-# image = Image.open(image_path)
 
-url = "https://d-art.ppstatic.pl/kadry/k/r/4b/e0/644912102461b_o_full.jpg"
-image = Image.open(requests.get(url, stream=True).raw)
+def visualize_object_detection_model3(file_path):
+    # Load model
+    model = YOLO('ultralyticsplus/yolov8s')
 
-feature_extractor = AutoFeatureExtractor.from_pretrained("microsoft/resnet-101")
-model = ResNetForImageClassification.from_pretrained("microsoft/resnet-101")
+    # Set model parameters
+    model.overrides['conf'] = 0.25  # NMS confidence threshold
+    model.overrides['iou'] = 0.45  # NMS IoU threshold
+    model.overrides['agnostic_nms'] = False  # NMS class-agnostic
+    model.overrides['max_det'] = 1000  # maximum number of detections per image
 
-inputs = feature_extractor(images=image, return_tensors="pt")
-with torch.no_grad():
-    logits = model(**inputs).logits
+    # Perform inference
+    results = model.predict(file_path)
 
-# model predicts one of the 1000 ImageNet classes
-predicted_label = logits.argmax(-1).item()
-predicted_class = model.config.id2label[predicted_label]
+    # Observe results
+    print(results[0].boxes)
 
-# Wizualizacja wyniku klasyfikacji
-fig, ax = plt.subplots(1)
-ax.imshow(image)
-ax.set_title(f"Predicted Class: {predicted_class}")
-plt.show()
+    # Render and display the result
+    render = render_result(model=model, image=file_path, result=results[0])
+    render.show()
