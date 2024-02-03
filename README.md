@@ -20,19 +20,19 @@ Skrypt `model3.py` wykorzystuje model mT5 do podsumowywania tekstu. Wczytuje zes
 
 ## Jak zacząć
 
-1. Sklonuj repozytorium:
+### 1. Sklonuj repozytorium:
 
 ```bash
 git clone https://github.com/twoja-nazwa-uzytkownika/ProjektNAI.git
 cd ProjektNAI
 ```
 
-2. Zainstaluj zależności:
+### 2. Zainstaluj zależności:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Uruchom odpowiedni skrypt modelu:
+### 3. Uruchom odpowiedni skrypt modelu:
 ```bash
 python3 main.py
 ```
@@ -42,7 +42,7 @@ python3 main.py
 py3 main.py
 ```
 
-4. Zbiór danych
+### 4. Zbiór danych
 Upewnij się, że twój zbiór danych jest w odpowiednim formacie (np. Excel) i zawiera niezbędne kolumny dla każdego skryptu.
 
 ## Współtwórcy
