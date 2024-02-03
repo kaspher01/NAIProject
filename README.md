@@ -34,10 +34,10 @@ pip install -r requirements.txt
 
 3. Uruchom odpowiedni skrypt modelu:
 ```bash
-    python3 main.py
+python3 main.py
 ```
 
-# lub
+### lub
 ```bash
 py3 main.py
 ```
@@ -46,7 +46,7 @@ py3 main.py
 Upewnij się, że twój zbiór danych jest w odpowiednim formacie (np. Excel) i zawiera niezbędne kolumny dla każdego skryptu.
 
 ## Współtwórcy
-Kacper Krawczyk (s24547)
+Kacper Krawczyk (s24547),
 Wojciech Bezak (s24573)
 
 
