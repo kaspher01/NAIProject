@@ -1,0 +1,19 @@
+WNIOSKI I PODSUMOWANIE WYNIKÓW
+Model 1
+Posiada umiarkowaną precyzję, co oznacza, że z wygenerowanych podsumowań duża część jest poprawna.
+Recall jest również umiarkowany, co sugeruje, że model ten jest w stanie odnaleźć określoną ilość informacji z rzeczywistego podsumowania.
+Wartość F1 średnio łączy precyzję i recall.
+
+Model 2
+Posiada niższą precyzję w porównaniu do Modelu 1, co może oznaczać, że wygenerowane podsumowania mogą zawierać więcej błędów.
+Recall jest niższy, co sugeruje, że model może pomijać pewne informacje z rzeczywistego podsumowania.
+Wartość F1 wskazuje na ogólnie średnią równowagę między precyzją a recall.
+
+Model 3
+Posiada najwyższą precyzję, co sugeruje, że większość wygenerowanych podsumowań jest poprawna.
+Recall jest jednak niski, co oznacza, że model ten może pomijać dużą ilość informacji z rzeczywistego podsumowania.
+Wartość F1 wskazuje na ogólnie niską równowagę między precyzją a recall.
+
+Podsumowując, każdy model ma swoje mocne i słabe strony.
+Model 1 i Model 2 wydają się mieć podobne wyniki, ale różnią się w precyzji.
+Model 3 ma wysoką precyzję, ale niski recall, co może oznaczać, że generuje podsumowania, które są poprawne, ale pomijają pewne kluczowe informacje.
