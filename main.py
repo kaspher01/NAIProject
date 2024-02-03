@@ -1,6 +1,6 @@
-from models.model1 import model_bart_large_cnn
-from models.model2 import model_falconsai
-from models.model3 import model_pszemraj_book_summary
+from models.model_bart_large_cnn import model_bart_large_cnn
+from models.model_falconsai import model_falconsai
+from models.model_pszemraj_book_summary import model_pszemraj_book_summary
 from utils.printer import print_all_results
 
 if __name__ == "__main__":
