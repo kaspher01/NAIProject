@@ -1,15 +1,9 @@
 from transformers import pipeline
-from rouge import Rouge
 import pandas as pd
+from utils.calculator import calculate_metrics
 
 
-def calculate_metrics(predicted_summary, actual_summary):
-    rouge = Rouge()
-    scores = rouge.get_scores(predicted_summary, actual_summary)
-    return scores[0]['rouge-l']['p'], scores[0]['rouge-l']['r'], scores[0]['rouge-l']['f']
-
-
-def model2(dataset_path):
+def model_falconsai(dataset_path):
     dataset = pd.read_excel(dataset_path, sheet_name='dataset')
     summarizer = pipeline("summarization", model="Falconsai/text_summarization")
 
@@ -30,9 +24,7 @@ def model2(dataset_path):
         all_f1s.append(f1)
 
     # Calculate mean metrics for the entire dataset
-    mean_precision = sum(all_precisions) / len(all_precisions)
-    mean_recall = sum(all_recalls) / len(all_recalls)
-    mean_f1 = sum(all_f1s) / len(all_f1s)
-
-    print("Model 2 - Falconsai/text_summarization")
-    print(f"Precision: {mean_precision}, Recall: {mean_recall}, F1: {mean_f1}")
+    model2_precision = sum(all_precisions) / len(all_precisions)
+    model2_recall = sum(all_recalls) / len(all_recalls)
+    model2_f1 = sum(all_f1s) / len(all_f1s)
+    return model2_precision, model2_recall, model2_f1
