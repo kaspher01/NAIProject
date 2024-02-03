@@ -1,43 +1,59 @@
 from transformers import pipeline
-from sklearn.metrics import precision_score, recall_score, f1_score
+from rouge import Rouge
 import pandas as pd
+import torch
+
 
 def calculate_metrics(predicted_summary, actual_summary):
-    # Convert predicted and actual summaries to binary arrays
-    predicted_bin = [1 if word in predicted_summary else 0 for word in actual_summary]
-    actual_bin = [1 if word in actual_summary else 0 for word in actual_summary]
+    rouge = Rouge()
+    scores = rouge.get_scores(predicted_summary, actual_summary)
+    return scores[0]['rouge-l']['p'], scores[0]['rouge-l']['r'], scores[0]['rouge-l']['f']
 
-    # Calculate metrics using scikit-learn functions
-    precision = precision_score(actual_bin, predicted_bin)
-    recall = recall_score(actual_bin, predicted_bin)
-    f1 = f1_score(actual_bin, predicted_bin)
-
-    return precision, recall, f1
 
 def model3(dataset_path):
     # Load the dataset
     dataset = pd.read_excel(dataset_path, sheet_name='dataset')
 
     # Initialize summarizer pipeline
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    hf_name = "pszemraj/led-base-book-summary"
+    summarizer = pipeline(
+        "summarization",
+        hf_name,
+        device=0 if torch.cuda.is_available() else -1,
+    )
 
     # Initialize lists to store metrics for all records
     all_precisions, all_recalls, all_f1s = [], [], []
 
     for index, row in dataset.iterrows():
-        actual_summary = summarizer(row['article'], max_length=150, min_length=30, do_sample=False)
+        # Assuming you have a 'predicted_summary' column in your dataset
         predicted_summary = row['predicted_summary']
 
-        actual_summary_text = actual_summary[0]['summary_text']
-        actual_summary_words = actual_summary_text.split()
+        actual_summary_results = summarizer(row['article'],
+                                            min_length=8,
+                                            max_length=256,
+                                            no_repeat_ngram_size=3,
+                                            encoder_no_repeat_ngram_size=3,
+                                            repetition_penalty=3.5,
+                                            num_beams=4,
+                                            do_sample=False,
+                                            early_stopping=True,
+                                            )
 
-        # Use the calculate_metrics function
-        precision, recall, f1 = calculate_metrics(predicted_summary.split(), actual_summary_words)
+        # Extract actual summaries from the summarizer results
+        actual_summaries = [result['summary_text'] for result in actual_summary_results]
 
-        # Append metrics to lists
-        all_precisions.append(precision)
-        all_recalls.append(recall)
-        all_f1s.append(f1)
+        # Calculate metrics for each actual summary
+        for actual_summary_text in actual_summaries:
+            actual_summary_words = actual_summary_text.split()
+
+            # Use the calculate_metrics function
+            precision, recall, f1 = calculate_metrics(predicted_summary.split(), actual_summary_words)
+
+            # Append metrics to lists
+            all_precisions.append(precision)
+            all_recalls.append(recall)
+            all_f1s.append(f1)
 
     # Calculate mean metrics for the entire dataset
     mean_precision = sum(all_precisions) / len(all_precisions)
@@ -46,6 +62,3 @@ def model3(dataset_path):
 
     print("Model 3 - pszemraj/led-base-book-summary")
     print(f"Precision: {mean_precision}, Recall: {mean_recall}, F1: {mean_f1}")
-
-# Call the function with the dataset path
-model3('dataset.xlsx')  # Change 'your_dataset.xlsx' to your actual dataset path

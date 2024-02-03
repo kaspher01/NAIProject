@@ -6,25 +6,22 @@ import pandas as pd
 def calculate_metrics(predicted_summary, actual_summary):
     rouge = Rouge()
     scores = rouge.get_scores(predicted_summary, actual_summary)
-
     return scores[0]['rouge-l']['p'], scores[0]['rouge-l']['r'], scores[0]['rouge-l']['f']
 
 
-def model1(dataset_path):
-    # Load the dataset
+def model2(dataset_path):
     dataset = pd.read_excel(dataset_path, sheet_name='dataset')
-
-    # Initialize summarizer pipeline
-    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    summarizer = pipeline("summarization", model="Falconsai/text_summarization")
 
     # Initialize lists to store metrics for all records
     all_precisions, all_recalls, all_f1s = [], [], []
 
     for index, row in dataset.iterrows():
-        actual_summary = summarizer(row['article'], max_length=150, min_length=30, do_sample=False)[0]['summary_text']
+        article = row['article']
+        actual_summary = summarizer(article, max_length=230, min_length=30, do_sample=False)[0]['summary_text']
         predicted_summary = row['predicted_summary']
 
-        # Use the calculate_metrics function
+        # Use the calculate_rouge_metrics function
         precision, recall, f1 = calculate_metrics(predicted_summary, actual_summary)
 
         # Append metrics to lists
@@ -37,6 +34,5 @@ def model1(dataset_path):
     mean_recall = sum(all_recalls) / len(all_recalls)
     mean_f1 = sum(all_f1s) / len(all_f1s)
 
-    print("Model 1 - facebook/bart-large-cnn")
+    print("Model 2 - /text_summarization")
     print(f"Precision: {mean_precision}, Recall: {mean_recall}, F1: {mean_f1}")
-    
