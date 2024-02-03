@@ -4,6 +4,6 @@ from model3 import model3
 
 if __name__ == "__main__":
     dataset_path = "./dataset.xlsx"
-    # model1(dataset_path)
-    # model2(dataset_path)
+    model1(dataset_path)
+    model2(dataset_path)
     model3(dataset_path)

@@ -45,10 +45,8 @@ def model3(dataset_path):
 
         # Calculate metrics for each actual summary
         for actual_summary_text in actual_summaries:
-            actual_summary_words = actual_summary_text.split()
-
             # Use the calculate_metrics function
-            precision, recall, f1 = calculate_metrics(predicted_summary.split(), actual_summary_words)
+            precision, recall, f1 = calculate_metrics(predicted_summary, actual_summary_text)
 
             # Append metrics to lists
             all_precisions.append(precision)

@@ -34,5 +34,5 @@ def model2(dataset_path):
     mean_recall = sum(all_recalls) / len(all_recalls)
     mean_f1 = sum(all_f1s) / len(all_f1s)
 
-    print("Model 2 - /text_summarization")
+    print("Model 2 - Falconsai/text_summarization")
     print(f"Precision: {mean_precision}, Recall: {mean_recall}, F1: {mean_f1}")
