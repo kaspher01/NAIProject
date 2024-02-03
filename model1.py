@@ -1,46 +1,51 @@
-from transformers import DetrImageProcessor, DetrForObjectDetection
-import torch
-from PIL import Image
-import requests
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+from transformers import pipeline
+from sklearn.metrics import precision_score, recall_score, f1_score
+import pandas as pd
 
 
-def visualize_object_detection_model1(file_path):
-    # Check if the file_path is a URL
-    if file_path.startswith('http://') or file_path.startswith('https://'):
-        # If it's a URL, use requests to get the image
-        response = requests.get(file_path, stream=True)
-        response.raise_for_status()
-        image = Image.open(response.raw)
-    else:
-        # If it's a local file, open it directly
-        image = Image.open(file_path)
+def calculate_metrics(predicted_summary, actual_summary):
+    # Convert predicted and actual summaries to binary arrays
+    predicted_bin = [1 if word in predicted_summary else 0 for word in actual_summary]
+    actual_bin = [1 if word in actual_summary else 0 for word in actual_summary]
 
-    # Define model and processor
-    processor = DetrImageProcessor.from_pretrained("facebook/detr-resnet-50", revision="no_timm")
-    model = DetrForObjectDetection.from_pretrained("facebook/detr-resnet-50", revision="no_timm")
+    # Calculate metrics using scikit-learn functions
+    precision = precision_score(actual_bin, predicted_bin)
+    recall = recall_score(actual_bin, predicted_bin)
+    f1 = f1_score(actual_bin, predicted_bin)
 
-    # Process the image and make predictions
-    inputs = processor(images=image, return_tensors="pt")
-    outputs = model(**inputs)
+    return precision, recall, f1
 
-    # Keep detections with confidence > 0.9
-    target_sizes = torch.tensor([image.size[::-1]])
-    results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=0.9)[0]
 
-    # Visualization
-    fig, ax = plt.subplots(1)
-    ax.imshow(image)
+def model1(dataset_path):
+    # Load the dataset
+    dataset = pd.read_excel(dataset_path, sheet_name='dataset')
 
-    for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
-        box = [round(i, 2) for i in box.tolist()]
+    # Initialize summarizer pipeline
+    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
-        # Draw rectangle around the detected object
-        rect = Rectangle((box[0], box[1]), box[2] - box[0], box[3] - box[1], fill=False, edgecolor='red', linewidth=2)
-        ax.add_patch(rect)
+    # Initialize lists to store metrics for all records
+    all_precisions, all_recalls, all_f1s = [], [], []
 
-        # Add label with name and detection precision
-        ax.text(box[0], box[1], f"{model.config.id2label[label.item()]}: {round(score.item(), 3)}", color='red')
+    for index, row in dataset.iterrows():
+        actual_summary = summarizer(row['article'], max_length=150, min_length=30, do_sample=False)
+        predicted_summary = row['predicted_summary']
 
-    plt.show()
+        actual_summary_text = actual_summary[0]['summary_text']
+        actual_summary_words = actual_summary_text.split()
+
+        # Use the calculate_metrics function
+        precision, recall, f1 = calculate_metrics(predicted_summary.split(), actual_summary_words)
+
+        # Append metrics to lists
+        all_precisions.append(precision)
+        all_recalls.append(recall)
+        all_f1s.append(f1)
+
+    # Calculate mean metrics for the entire dataset
+    mean_precision = sum(all_precisions) / len(all_precisions)
+    mean_recall = sum(all_recalls) / len(all_recalls)
+    mean_f1 = sum(all_f1s) / len(all_f1s)
+
+    print("Model 1 - /bart-large-cnn")
+    print(f"Precision: {mean_precision}, Recall: {mean_recall}, F1: {mean_f1}")
+
