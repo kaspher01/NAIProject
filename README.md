@@ -16,7 +16,7 @@ Skrypt `model2.py` wykorzystuje model mT5 do podsumowywania tekstu. Wczytuje zes
 
 ### Model 3 - LED (pszemraj/led-base-book-summary) 
 
-Skrypt `model3.py` wykorzystuje model mT5 do podsumowywania tekstu. Wczytuje zestaw danych, generuje podsumowania i ocenia wydajność, korzystając z precyzji, czułości i wyniku F1.
+Skrypt `model3.py` wykorzystuje model LED do podsumowywania tekstu. Wczytuje zestaw danych, generuje podsumowania i ocenia wydajność, korzystając z precyzji, czułości i wyniku F1.
 
 ## Jak zacząć
 
