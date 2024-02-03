@@ -5,10 +5,10 @@ from utils.calculator import calculate_metrics
 
 
 def model_pszemraj_book_summary(dataset_path):
-    # Load the dataset
+    # Wczytanie zbioru danych
     dataset = pd.read_excel(dataset_path, sheet_name='dataset')
 
-    # Initialize summarizer pipeline
+    # Inicjalizacja pipeline do sumaryzacji
     hf_name = "pszemraj/led-base-book-summary"
     summarizer = pipeline(
         "summarization",
@@ -16,11 +16,10 @@ def model_pszemraj_book_summary(dataset_path):
         device=0 if torch.cuda.is_available() else -1,
     )
 
-    # Initialize lists to store metrics for all records
+    # Inicjalizacja listy do przechowywania metryk dla wszystkich rekordów
     all_precisions, all_recalls, all_f1s = [], [], []
 
     for index, row in dataset.iterrows():
-        # Assuming you have a 'predicted_summary' column in your dataset
         predicted_summary = row['predicted_summary']
 
         actual_summary_results = summarizer(row['article'],
@@ -34,20 +33,20 @@ def model_pszemraj_book_summary(dataset_path):
                                             early_stopping=True,
                                             )
 
-        # Extract actual summaries from the summarizer results
+        # Wyciągnięcie rzeczywistego podsumowania z wyników sumaryzatora
         actual_summaries = [result['summary_text'] for result in actual_summary_results]
 
-        # Calculate metrics for each actual summary
+        # Obliczenie metryk dla każdego rzeczywistego podsumowania
         for actual_summary_text in actual_summaries:
-            # Use the calculate_metrics function
+             # Użycie funkcji calculate_metrics
             precision, recall, f1 = calculate_metrics(predicted_summary, actual_summary_text)
 
-            # Append metrics to lists
+            # Dodanie metryki do list
             all_precisions.append(precision)
             all_recalls.append(recall)
             all_f1s.append(f1)
 
-    # Calculate mean metrics for the entire dataset
+    # Obliczenie średniej metryki dla całego zbioru danych
     model3_precision = sum(all_precisions) / len(all_precisions)
     model3_recall = sum(all_recalls) / len(all_recalls)
     model3_f1 = sum(all_f1s) / len(all_f1s)
